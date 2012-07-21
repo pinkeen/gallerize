@@ -141,7 +141,6 @@
                 this.image.hide();
             else
                 this.image.fadeOut(this.fadeDuration);
-                
         }
         else
         {
@@ -159,7 +158,9 @@
             fitScreen : true,
             imageFadeDuration: 200,
             wrap: true,
-            fullscreen: true
+            fullscreen: true,
+            showCounter: true,
+            showInfo: true
         }, settings);
 
         this.index = null;
@@ -170,8 +171,15 @@
         this.fitScreen = this.settings.fitScreen;
         this.screen = $('<div>', {'class' : 'gallerize'}).appendTo($('body'));
 
-        var self = this;
+        if(this.settings.showCounter)
+            this.counter = $('<div/>', {'class' : 'counter box'}).appendTo(this.screen);
 
+        if(this.settings.showInfo)
+        {
+            this.info = $('<div/>', {'class' : 'info box'}).appendTo(this.screen);
+        }
+
+        var self = this;
         var elements = container.find('a > img');
 
         if(elements.length == 0)
@@ -185,7 +193,7 @@
 
             picture.thumb = img.attr('src');
             picture.title = a.attr('title');
-            picture.alt = img.attr('alt');
+            picture.description = img.attr('alt');
 
             var index = self.pictures.push(picture) - 1;
 
@@ -242,6 +250,32 @@
             oldPicture.hide(instant);
 
         picture.show(instant);
+
+        if(this.settings.showCounter)
+            this.counter.html((this.index + 1) + ' / ' + this.pictures.length);
+
+        if(this.settings.showInfo)
+        {
+            if(picture.description || picture.title)
+            {
+                this.info.html('');
+                
+                if(picture.title)
+                    $('<div/>', {'class' : 'title'}).html(picture.title).appendTo(this.info);
+
+                if(picture.description)
+                    $('<div/>', {'class' : 'description'}).html(picture.description).appendTo(this.info);
+
+                if(!this.info.is(':visible'))
+                {
+                    this.info.fadeIn(this.settings.fadeDuration);
+                }
+            }
+            else if(this.info.is(':visible'))
+            {
+                this.info.fadeOut(this.settings.fadeDuration);
+            }
+        }
     };
     
     Gallerize.prototype.close = function()
