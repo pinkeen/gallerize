@@ -1,0 +1,34 @@
+.gallerize {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+}
+
+.gallerize .picture {
+    display: none;
+    position: absolute;
+}
+
+.gallerize .spinner {
+    display: none;
+    background: transparent url(spinner.gif) no-repeat center center;
+    width: 100%;
+    height: 100%;
+}
+
+.gallerize .bar {
+    width: 100%;
+    position: relative;
+    bottom: 0;
+    height: 100px;
+    background-color: #222;
+}
+
+.gallerize .bar .thumbs {
+    height: 80px;
+    position: relative;
+}
