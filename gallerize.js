@@ -60,8 +60,6 @@
             this.show();
             this.resize();
         }
-
-        console.log('Loaded ' + this.src);
     };
 
     Picture.prototype.setSize = function(fitScreen)
@@ -117,7 +115,7 @@
         
         if(this.loaded)
         {
-            if(this.fadeDuration == 0 || instant)
+            if(instant)
                 this.image.show();
             else
                 this.image.fadeIn(this.fadeDuration);
@@ -137,7 +135,7 @@
         
         if(this.loaded)
         {
-            if(this.fadeDuration == 0 || instant)
+            if(instant)
                 this.image.hide();
             else
                 this.image.fadeOut(this.fadeDuration);
@@ -160,7 +158,10 @@
             wrap: true,
             fullscreen: true,
             showCounter: true,
-            showInfo: true
+            showInfo: true,
+            showBar: true,
+            barFadeDuration: 200,
+            barHideTimeout: 1000
         }, settings);
 
         this.index = null;
@@ -170,14 +171,6 @@
         this.open = false;
         this.fitScreen = this.settings.fitScreen;
         this.screen = $('<div>', {'class' : 'gallerize'}).appendTo($('body'));
-
-        if(this.settings.showCounter)
-            this.counter = $('<div/>', {'class' : 'counter box'}).appendTo(this.screen);
-
-        if(this.settings.showInfo)
-        {
-            this.info = $('<div/>', {'class' : 'info box'}).appendTo(this.screen);
-        }
 
         var self = this;
         var elements = container.find('a > img');
@@ -191,7 +184,7 @@
 
             var picture = new Picture(a.attr('href'), self.screen, self.settings);
 
-            picture.thumb = img.attr('src');
+            picture.thumbSrc = img.attr('src');
             picture.title = a.attr('title');
             picture.description = img.attr('alt');
 
@@ -208,7 +201,66 @@
                 $.proxy(data.gallerize.show, data.gallerize)(data.index);
             });
         });
+
+        if(this.settings.showCounter)
+            this.counter = $('<div/>', {'class' : 'counter box'}).appendTo(this.screen);
+
+        if(this.settings.showInfo)
+            this.info = $('<div/>', {'class' : 'info box'}).appendTo(this.screen);
+
+        if(this.settings.showBar)
+            this.createBar();
     }
+
+    Gallerize.prototype.createBar = function()
+    {
+        var wrapper = $('<div/>', {'class' : 'bar-wrapper'}).appendTo(this.screen);
+        this.bar = $('<div/>', {'class' : 'bar box'}).appendTo(wrapper);
+        var padding = $('<div/>', {'class' : 'padding'}).appendTo(this.bar);
+        this.thumbs = $('<div/>', {'class' : 'thumbs'}).appendTo(padding);
+        this.scroller = $('<div/>', {'class' : 'scroller'}).appendTo(this.thumbs);
+        var inner = $('<div/>').appendTo(this.scroller).css('float', 'left');
+
+        var width = 0;
+
+        for(index in this.pictures)
+        {
+            var picture = this.pictures[index];
+            
+            picture.thumb = $('<div/>', {'class' : 'thumb'}).append(
+                $('<img/>', {'src' : picture.thumbSrc}),
+                $('<div/>', {'class' : 'overlay'})
+            ).appendTo(inner);
+
+            picture.thumb.click({ index: index }, $.proxy(function(event) {
+                this.switch(parseInt(event.data.index));
+            }, this));
+        }
+        
+       
+        this.thumbs.mousemove({thumbs: this.thumbs, inner: inner, scroller: this.scroller}, function(event) {
+            var tw = event.data.thumbs.width();
+            var iw = event.data.inner.width();
+
+            if(iw <= tw)
+                return;
+            
+            var x = (event.clientX / tw) * (iw - tw);
+            event.data.scroller.css('left', -x + 'px');
+        });
+
+        wrapper.mouseover({bar : this.bar, duration: this.settings.barFadeDuration}, function(event) {
+            event.data.bar.fadeIn(event.data.duration);
+        });
+
+        wrapper.mouseleave({bar : this.bar, duration: this.settings.barFadeDuration, timeout: this.settings.barHideTimeout}, function(event) {
+            setTimeout(function() {
+                event.data.bar.fadeOut(event.data.duration);
+            }, event.data.timeout);
+        });
+        
+        
+    };
     
     Gallerize.prototype.show = function(index)
     {
@@ -239,6 +291,28 @@
 
         var oldPicture = this.index === null ? null : this.pictures[this.index];
         var picture = this.pictures[index];
+
+        if(this.settings.showBar)
+        {
+            picture.thumb.find('.overlay').toggleClass('selected');
+
+            var pos = this.scroller.position().left;
+            var startpos = picture.thumb.position().left;
+            var endpos = startpos + picture.thumb.width();
+            var width = this.thumbs.width();
+            
+            if((endpos + pos) > width)
+                pos = width - endpos;
+
+            if((startpos + pos) < 0)
+                pos = -startpos;
+
+            this.scroller.animate({'left': pos + 'px'}, this.settings.imageFadeDuration);
+                
+            
+            if(oldPicture !== null)
+                oldPicture.thumb.find('.overlay').toggleClass('selected');
+        }
 
         this.index = index;
         
