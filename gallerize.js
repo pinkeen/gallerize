@@ -45,8 +45,9 @@
         if(this.loaded)
             return;
 
-        this.image = $('<img/>', {'src' : this.src, 'class' : 'picture'});
+        this.image = $('<img/>', {'class' : 'picture'});
         this.image.load($.proxy(this.onLoaded, this));
+        this.image.attr('src', this.src); // Do this after .load() to fix IE caching issues
         //this.image.load($.proxy(function() {setTimeout($.proxy(this.onLoaded,this), 300);}, this));
     };
 
@@ -70,7 +71,7 @@
             return;
 
         this.resize();
-    }
+    };
 
     Picture.prototype.resize = function(fitScreen)
     {
@@ -210,7 +211,7 @@
 
         if(this.settings.showBar)
             this.createBar();
-    }
+    };
 
     Gallerize.prototype.createBar = function()
     {
@@ -233,7 +234,7 @@
             ).appendTo(inner);
 
             picture.thumb.click({ index: index }, $.proxy(function(event) {
-                this.switch(parseInt(event.data.index));
+                this.switchPicture(parseInt(event.data.index));
             }, this));
         }
         
@@ -265,7 +266,7 @@
     Gallerize.prototype.show = function(index)
     {
         if(this.open)
-            return this.switch(index);
+            return this.switchPicture(index);
             
         this.open = true;
         $(document).bind('keyup.gallerize', $.proxy(this.onKeyUp, this));
@@ -273,15 +274,15 @@
         this.screen.show();
 
         if(typeof index == 'undefined' && this.index === null)
-            this.switch(0, true);
+            this.switchPicture(0, true);
         else
-            this.switch(index, true);
+            this.switchPicture(index, true);
 
         if(this.settings.fullscreen)
             this.enableFullScreen();
     };
 
-    Gallerize.prototype.switch = function(index, instant)
+    Gallerize.prototype.switchPicture = function(index, instant)
     {
         if(typeof index == 'undefined')
             return;
@@ -398,8 +399,8 @@
         return index;
     };
 
-    Gallerize.prototype.next = function() { this.switch(this.getNextIndex()); }
-    Gallerize.prototype.previous = function() { this.switch(this.getPreviousIndex()); }
+    Gallerize.prototype.next = function() { this.switchPicture(this.getNextIndex()); }
+    Gallerize.prototype.previous = function() { this.switchPicture(this.getPreviousIndex()); }
 
     Gallerize.prototype.onResize = function()
     {

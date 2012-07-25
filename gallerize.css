@@ -105,6 +105,7 @@
 
 .gallerize .bar .thumbs .thumb img {
     height: 100px;
+	width: auto;
     margin: 0 auto;
 }
 
