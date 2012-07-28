@@ -20,12 +20,67 @@
     height: 100%;
 }
 
+.gallerize .btn {
+    background-color: black;
+    background-color: rgba(0, 0, 0, 0.5);    
+    background-image: url(images/icons.png);
+    background-repeat: no-repeat;
+
+    padding: 5px;
+    
+    width: 20px;
+    height: 20px;
+
+    cursor: pointer;
+   
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+
+    margin-bottom: 10px;
+}
+
+.gallerize .btn:hover {
+    background-color: #666;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.gallerize .buttons {
+    position: absolute;
+    width: 30px;
+    height: 70px;
+    right: 10px;
+    top: 10px;
+    z-index: 50;
+}
+
+.gallerize .btn-close { background-position: -55px 5px; }
+.gallerize .btn-real-size { background-position: -25px 5px; }
+.gallerize .btn-fit-screen { background-position: 5px 5px; }
+
+.gallerize .arrow {
+    position: absolute;
+    top: 10%;
+    z-index: 40;
+    height: 80%;
+    width: 20%;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+.gallerize .arrow-left { left: 0; background-position: left center; }
+.gallerize .arrow-left:hover { background-image: url(images/arrow-left.png); }
+.gallerize .arrow-right { right: 0; background-position: right center; }
+.gallerize .arrow-right:hover { background-image: url(images/arrow-right.png); }
+
+
 .gallerize .box {
     position: absolute;
     z-index: 100;
     padding: 5px;
     background-color: black;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
+    opacity: 0.83;
     color: #fff;
 
     font-family: sans-serif;
@@ -44,7 +99,7 @@
 
 .gallerize .info {
     top: 10px;
-    right: 10px;
+    right: 50px;
     display: none;
     text-align: right;
     max-width: 25%;
@@ -74,12 +129,15 @@
     -webkit-border-radius: 0px;
     -moz-border-radius: 0px;
     border-radius: 0px;
-    display: none;
+
+    background-color: black;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 1.0;    
 }
 
 .gallerize .bar .padding {
     padding: 10px;
-    overflow: hidden;
+    /*overflow: hidden;*/
 }
 
 .gallerize .bar .thumbs {
@@ -117,14 +175,20 @@
     height: 100%;    
     z-index: 110;
     background-color: transparent;
+    opacity: 1.0;
 }
 
 .gallerize .bar .thumbs .thumb:hover .overlay {
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: #000;
+    opacity: 0.6;
+    filter: alpha(opacity = 60);
 }
 
 .gallerize .bar .thumbs .thumb:hover .selected,
 .gallerize .bar .thumbs .thumb .selected {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: #aaa;
+    opacity: 0.6;
+    filter: alpha(opacity = 60);
 }
+
 

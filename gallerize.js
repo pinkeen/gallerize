@@ -67,7 +67,7 @@
     {
         this.fitScreen = fitScreen;
 
-        if(!loaded)
+        if(!this.loaded)
             return;
 
         this.resize();
@@ -160,9 +160,11 @@
             fullscreen: true,
             showCounter: true,
             showInfo: true,
-            showBar: true,
-            barFadeDuration: 200,
-            barHideTimeout: 1000
+            showThumbs: true,
+            showResizeButton: true,
+            thumbsAlwaysVisible: false,
+            thumbsFadeDuration: 200,
+            thumbsHideTimeout: 1000
         }, settings);
 
         this.index = null;
@@ -209,11 +211,51 @@
         if(this.settings.showInfo)
             this.info = $('<div/>', {'class' : 'info box'}).appendTo(this.screen);
 
-        if(this.settings.showBar)
-            this.createBar();
+        if(this.settings.showThumbs)
+            this.createThumbs();
+
+        this.buttons = $('<div/>', {'class' : 'buttons'}).appendTo(this.screen);
+        
+        this.buttonClose = $('<div/>', {'class' : 'btn btn-close'}).appendTo(this.buttons).click($.proxy(function() {
+                this.close();
+        }, this));
+
+        if(this.settings.showResizeButton)
+        {
+            this.buttonRealSize = $('<div/>', {'class' : 'btn btn-real-size'}).appendTo(this.buttons).click($.proxy(function() {
+                    this.buttonRealSize.hide();
+                    this.buttonFitScreen.show();
+                    this.setSize(false);
+            }, this));
+
+            this.buttonFitScreen = $('<div/>', {'class' : 'btn btn-fit-screen'}).appendTo(this.buttons).click($.proxy(function() {
+                    this.buttonRealSize.show();
+                    this.buttonFitScreen.hide();
+                    this.setSize(true);
+            }, this));
+
+            if(this.fitScreen)
+                this.buttonFitScreen.hide();
+            else
+                this.buttonRealSize.hide();
+        }
+
+        $('<div/>', {'class' : 'arrow arrow-left'}).appendTo(this.screen).click($.proxy(this.previous, this));
+        $('<div/>', {'class' : 'arrow arrow-right'}).appendTo(this.screen).click($.proxy(this.next, this));
+            
     };
 
-    Gallerize.prototype.createBar = function()
+    Gallerize.prototype.setSize = function(fitScreen)
+    {
+        this.fitScreen = fitScreen;
+        
+        for(i in this.pictures)
+        {
+            this.pictures[i].setSize(fitScreen);
+        }
+    };
+
+    Gallerize.prototype.createThumbs = function()
     {
         var wrapper = $('<div/>', {'class' : 'bar-wrapper'}).appendTo(this.screen);
         this.bar = $('<div/>', {'class' : 'bar box'}).appendTo(wrapper);
@@ -250,17 +292,32 @@
             event.data.scroller.css('left', -x + 'px');
         });
 
-        wrapper.mouseover({bar : this.bar, duration: this.settings.barFadeDuration}, function(event) {
-            event.data.bar.fadeIn(event.data.duration);
-        });
+        if(this.settings.thumbsAlwaysVisible)
+        {
+            this.bar.show();
+        }
+        else
+        {
+            this.bar.hide();
+            this.bar.data('gallerize', {hover: false});
+            
+            wrapper.mouseover({bar : this.bar, duration: this.settings.thumbsFadeDuration}, function(event) {
+                var data = event.data.bar.data('gallerize');
+                if(data.hover)
+                    return;
+                data.hover = true;
+                event.data.bar.stop().fadeIn(event.data.duration);
+            });
 
-        wrapper.mouseleave({bar : this.bar, duration: this.settings.barFadeDuration, timeout: this.settings.barHideTimeout}, function(event) {
-            setTimeout(function() {
-                event.data.bar.fadeOut(event.data.duration);
-            }, event.data.timeout);
-        });
-        
-        
+            wrapper.mouseleave({bar : this.bar, duration: this.settings.thumbsFadeDuration, timeout: this.settings.thumbsHideTimeout}, function(event) {
+                event.data.bar.data('gallerize').hover = false;
+                setTimeout(function() {
+                    if(event.data.bar.data('gallerize').hover)
+                        return;
+                    event.data.bar.stop().fadeOut(event.data.duration);
+                }, event.data.timeout);
+            });
+        }
     };
     
     Gallerize.prototype.show = function(index)
@@ -293,9 +350,10 @@
         var oldPicture = this.index === null ? null : this.pictures[this.index];
         var picture = this.pictures[index];
 
-        if(this.settings.showBar)
+        if(this.settings.showThumbs)
         {
             picture.thumb.find('.overlay').toggleClass('selected');
+            //picture.thumb.animate({'margin-top': '-20px'});
 
             var pos = this.scroller.position().left;
             var startpos = picture.thumb.position().left;
@@ -312,7 +370,10 @@
                 
             
             if(oldPicture !== null)
+            {
                 oldPicture.thumb.find('.overlay').toggleClass('selected');
+                //oldPicture.thumb.animate({'margin-top': '0px'});
+            }
         }
 
         this.index = index;
