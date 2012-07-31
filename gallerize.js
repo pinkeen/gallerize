@@ -1,34 +1,32 @@
-/***************************************************************************
- *                                                                         *
- *  Gallerize - A jQuery Fullscreen Gallery Plugin                         *
- *  2012 (c) Filip Sobalski <pinkeen@gmail.com>                            *
- *                                                                         *
- *  Permission is hereby granted, free of charge, to any person obtaining  *
- *  a copy of this software and associated documentation files (the        *
- *  "Software"), to deal in the Software without restriction, including    *
- *  without limitation the rights to use, copy, modify, merge, publish,    *
- *  distribute, sublicense, and/or sell copies of the Software, and to     *
- *  permit persons to whom the Software is furnished to do so, subject to  *
- *  the following conditions:                                              *
- *                                                                         *
- *  The above copyright notice and this permission notice shall be         *
- *  included in all copies or substantial portions of the Software.        *
- *                                                                         *
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,        *
- *  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF     *
- *  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND                  *
- *  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE *
- *  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION *
- *  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION  *
- *  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.        *
- *                                                                         *
- ***************************************************************************/
-
-/*jslint eqeq: true, plusplus: true, sloppy: true, vars: true, white: true, browser: true */
+/*
+                                                                         
+    Gallerize - A jQuery Fullscreen Gallery Plugin                         
+    2012 (c) Filip Sobalski <pinkeen@gmail.com>                            
+                                                                        
+    Permission is hereby granted, free of charge, to any person obtaining  
+    a copy of this software and associated documentation files (the        
+    "Software"), to deal in the Software without restriction, including    
+    without limitation the rights to use, copy, modify, merge, publish,    
+    distribute, sublicense, and/or sell copies of the Software, and to     
+    permit persons to whom the Software is furnished to do so, subject to  
+    the following conditions:                                              
+                                                                         
+    The above copyright notice and this permission notice shall be         
+    included in all copies or substantial portions of the Software.        
+                                                                         
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,        
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF     
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND                  
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
+    LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
+    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION  
+    WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.        
+                                                                         
+*/
 
 (function($)
 {
-    /* Picture class */
+    /*** Picture class ***/
 
     function Picture(src, container, settings)
     {
@@ -39,7 +37,7 @@
         this.visible = false;
         this.container = container;
         this.container.append(this.spinner);
-        this.fadeDuration = settings.fadeDuration;
+        this.fadeDuration = settings.imageFadeDuration;
     }
 
     Picture.prototype.load = function()
@@ -50,7 +48,8 @@
 
         this.image = $('<img/>', {'class' : 'picture'});
         this.image.load($.proxy(this.onLoaded, this));
-        this.image.attr('src', this.src); // Do this after .load() to fix IE caching issues
+        /* Do this after .load() to fix IE caching issues. */
+        this.image.attr('src', this.src); 
     };
 
     Picture.prototype.onLoaded = function()
@@ -116,7 +115,7 @@
             if(instant) {
                 this.image.show();
             } else {
-                this.image.fadeIn(this.fadeDuration);
+                this.image.fadeIn(this.fadeDuration, 'linear');
             }
             this.resize();
         }
@@ -135,7 +134,7 @@
             if(instant) {
                 this.image.hide();
             } else {
-                this.image.fadeOut(this.fadeDuration);
+                this.image.fadeOut(this.fadeDuration, 'linear');
             }
         } else {
             this.spinner.hide();
@@ -144,22 +143,25 @@
         this.visible = false;
     };
     
-    /* Gallerize class */
+    /*** Gallerize class ****/
     
     function Gallerize(container, settings)
     {
         this.settings = $.extend(true, {
             fitScreen : true,
-            imageFadeDuration: 200,
             wrap: true,
-            fullscreen: true,
+            fullscreen: false,
+            preloadAll: false,
             showCounter: true,
             showInfo: true,
             showThumbs: true,
             showResizeButton: true,
+            imageFadeDuration: 0,            
             thumbsAlwaysVisible: false,
             thumbsFadeDuration: 200,
-            thumbsHideTimeout: 1000
+            thumbsHideTimeout: 500,
+            arrowsFadeDuration: 300,
+            thumbSlideDuration: 300
         }, settings);
 
         this.index = null;
@@ -186,6 +188,9 @@
             picture.thumbSrc = img.attr('src');
             picture.title = a.attr('title');
             picture.description = img.attr('alt');
+
+            if(self.settings.preloadAll)
+                picture.load();
 
             var index = self.pictures.push(picture) - 1;
 
@@ -239,8 +244,22 @@
             }
         }
 
-        $('<div/>', {'class' : 'arrow arrow-left'}).appendTo(this.screen).click($.proxy(this.previous, this));
-        $('<div/>', {'class' : 'arrow arrow-right'}).appendTo(this.screen).click($.proxy(this.next, this));
+        var arrowsFadeDuration = this.settings.arrowsFadeDuration;
+        var fadeToggle = function() {
+            $(this).find('.arrow').stop().fadeToggle(arrowsFadeDuration);
+        };
+        
+        $('<div/>', {'class' : 'arrow-area arrow-area-left'})
+            .append($('<div/>', {'class' : 'arrow arrow-left'}))
+            .appendTo(this.screen)
+            .click($.proxy(this.previous, this))
+            .hover(fadeToggle, fadeToggle);
+            
+        $('<div/>', {'class' : 'arrow-area arrow-area-right'})
+            .append($('<div/>', {'class' : 'arrow arrow-right'}))
+            .appendTo(this.screen)
+            .click($.proxy(this.next, this))
+            .hover(fadeToggle, fadeToggle);
             
     }
 
@@ -256,10 +275,8 @@
 
     Gallerize.prototype.createThumbs = function()
     {
-        this.thumbsWrapper = $('<div/>', {'class' : 'bar-wrapper'}).appendTo(this.screen);
-        this.bar = $('<div/>', {'class' : 'bar box'}).appendTo(this.thumbsWrapper);
-        this.thumbsPadding = $('<div/>', {'class' : 'padding'}).appendTo(this.bar);
-        this.thumbs = $('<div/>', {'class' : 'thumbs'}).appendTo(this.thumbsPadding);
+        this.thumbsWrapper = $('<div/>', {'class' : 'thumbs-wrapper'}).appendTo(this.screen);
+        this.thumbs = $('<div/>', {'class' : 'thumbs'}).appendTo(this.thumbsWrapper);
         this.scroller = $('<div/>', {'class' : 'scroller'}).appendTo(this.thumbs);
         this.thumbsInner = $('<div/>').appendTo(this.scroller).css('float', 'left');
 
@@ -282,6 +299,8 @@
         
        
         this.thumbs.mousemove({thumbs: this.thumbs, inner: this.thumbsInner, scroller: this.scroller}, function(event) {
+            if(event.data.scroller.is(':animated'))
+                return;
             var tw = event.data.thumbs.width();
             var iw = event.data.inner.width();
 
@@ -294,12 +313,12 @@
         });
 
         if(this.settings.thumbsAlwaysVisible) {
-            this.bar.show();
+            this.thumbs.show();
         } else {
-            this.bar.hide();
-            this.bar.data('gallerize', {hover: false});
+            this.thumbs.hide();
+            this.thumbs.data('gallerize', {hover: false});
             
-            this.thumbsWrapper.mouseover({bar : this.bar, duration: this.settings.thumbsFadeDuration}, function(event) {
+            this.thumbsWrapper.mouseover({bar : this.thumbs, duration: this.settings.thumbsFadeDuration}, function(event) {
                 var data = event.data.bar.data('gallerize');
                 
                 if(data.hover) {
@@ -307,16 +326,16 @@
                 }
                 
                 data.hover = true;
-                event.data.bar.stop().fadeIn(event.data.duration);
+                event.data.bar.stop().fadeIn(event.data.duration, 'linear');
             });
 
-           this.thumbsWrapper.mouseleave({bar : this.bar, duration: this.settings.thumbsFadeDuration, timeout: this.settings.thumbsHideTimeout}, function(event) {
+           this.thumbsWrapper.mouseleave({bar : this.thumbs, duration: this.settings.thumbsFadeDuration, timeout: this.settings.thumbsHideTimeout}, function(event) {
                 event.data.bar.data('gallerize').hover = false;
                 setTimeout(function() {
                     if(event.data.bar.data('gallerize').hover) {
                         return;
                     }
-                    event.data.bar.stop().fadeOut(event.data.duration);
+                    event.data.bar.stop().fadeOut(event.data.duration, 'linear');
                 }, event.data.timeout);
             });
         }
@@ -331,6 +350,7 @@
         this.open = true;
         $(document).bind('keyup.gallerize', $.proxy(this.onKeyUp, this));
         $(window).bind('resize.gallerize', $.proxy(this.onResize, this));
+        this.screen.bind('mousewheel.gallerize', $.proxy(this.onMouseWheel, this));
         this.screen.show();
 
         if(typeof index == 'undefined' && this.index === null) {
@@ -343,6 +363,25 @@
             this.enableFullScreen();
         }
     };
+
+    Gallerize.prototype.close = function()
+    {
+        if(!this.open) {
+            return;
+        }
+
+        this.open = false;
+
+        $(document).unbind('keyup.gallerize');
+        $(window).unbind('resize.gallerize');
+        this.screen.unbind('mousewheel.gallerize');
+
+        this.screen.hide();
+
+        if(this.settings.fullscreen) {
+            this.disableFullScreen();
+        }
+    };    
 
     Gallerize.prototype.switchPicture = function(index, instant)
     {
@@ -358,26 +397,28 @@
             picture = this.pictures[index];
 
         if(this.settings.showThumbs) {
-            picture.thumb.find('.overlay').toggleClass('selected');
-
+            picture.thumb.toggleClass('selected');
+            
             var pos = this.scroller.position().left,
                 startpos = picture.thumb.position().left,
                 endpos = startpos + picture.thumb.width(),
-                width = this.thumbs.width();
+                width = this.thumbs.width(),
+                newpos = pos;
             
             if((endpos + pos) > width) {
-                pos = width - endpos;
+                newpos = width - endpos;
             }
 
             if((startpos + pos) < 0) {
-                pos = -startpos;
+                newpos = -startpos;
             }
-
-            this.scroller.animate({'left': pos + 'px'}, this.settings.imageFadeDuration);
+            
+            if(newpos != pos)
+                this.scroller.stop(true).animate({'left': newpos + 'px'}, this.settings.thumbSlideDuration, 'linear');
                 
             
             if(oldPicture !== null) {
-                oldPicture.thumb.find('.overlay').toggleClass('selected');
+                oldPicture.thumb.toggleClass('selected');
             }
         }
 
@@ -410,32 +451,14 @@
                 }
 
                 if(!this.info.is(':visible')) {
-                    this.info.fadeIn(this.settings.fadeDuration);
+                    this.info.fadeIn(this.settings.imageFadeDuration, 'linear');
                 }
             } else if(this.info.is(':visible')) {
-                this.info.fadeOut(this.settings.fadeDuration);
+                this.info.fadeOut(this.settings.imageFadeDuration, 'linear');
             }
         }
     };
     
-    Gallerize.prototype.close = function()
-    {
-        if(!this.open) {
-            return;
-        }
-
-        this.open = false;
-        
-        $(document).unbind('keyup.gallerize');
-        $(window).unbind('resize.gallerize');
-
-        this.screen.hide();
-
-        if(this.settings.fullscreen) {
-            this.disableFullScreen();
-        }
-    };
-
     Gallerize.prototype.getNextIndex = function()
     {
         var index = this.index + 1;
@@ -469,6 +492,19 @@
 
     Gallerize.prototype.next = function() { this.switchPicture(this.getNextIndex()); };
     Gallerize.prototype.previous = function() { this.switchPicture(this.getPreviousIndex()); };
+
+    Gallerize.prototype.onMouseWheel = function(event, delta, deltaX, deltaY)
+    {
+        event.preventDefault();
+        
+        if(deltaY > 0) {
+            this.next();
+        }
+
+        if(deltaY < 0) {
+            this.previous();
+        }
+    };
 
     Gallerize.prototype.onResize = function()
     {
@@ -527,7 +563,7 @@
     };
     
 
-    /* jQuery boilerplate */
+    /*** jQuery boilerplate ***/
 
     function init(settings)
     {

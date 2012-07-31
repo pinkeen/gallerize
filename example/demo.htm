@@ -2,10 +2,15 @@
 <html>
     <head>
         <title>Gallerize Demo</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        
         <link rel='stylesheet' href='../gallerize.css' type='text/css' media='all' />
         <link rel='stylesheet' href='demo.css' type='text/css' media='all' />
+        
         <script src='http://code.jquery.com/jquery-1.7.2.min.js' type='text/javascript'></script>
-        <script src='../gallerize.js' type='text/javascript'></script>        
+        
+        <script src='../jquery.mousewheel.js' type='text/javascript'></script>
+        <script src='../gallerize.js' type='text/javascript'></script>
     </head>
     <body>
         <div id="gallery">
@@ -64,8 +69,7 @@
         <script>
             $(document).ready(function() {
                 $('#gallery').gallerize({
-                    fitScreen: true,
-                    fullscreen: false
+                    preloadAll: true
                 });
 
                 $('#show-button').click(function(e) {

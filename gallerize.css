@@ -58,20 +58,77 @@
 .gallerize .btn-real-size { background-position: -25px 5px; }
 .gallerize .btn-fit-screen { background-position: 5px 5px; }
 
-.gallerize .arrow {
+.gallerize .arrow-area {
     position: absolute;
     top: 10%;
     z-index: 40;
     height: 80%;
     width: 20%;
-    background-repeat: no-repeat;
     cursor: pointer;
 }
 
-.gallerize .arrow-left { left: 0; background-position: left center; }
-.gallerize .arrow-left:hover { background-image: url(images/arrow-left.png); }
-.gallerize .arrow-right { right: 0; background-position: right center; }
-.gallerize .arrow-right:hover { background-image: url(images/arrow-right.png); }
+.gallerize .arrow-area-left { left: 0; }
+.gallerize .arrow-area-right { right: 0; }
+
+.gallerize .arrow {
+    display: none;
+
+    position: absolute;
+    top: 50%;
+    margin-top: -75px;
+    width: 120px;
+    height: 150px;
+
+    padding: 15px;
+    
+    background-color: black;
+    background-color: rgba(0, 0, 0, 0.5);
+    background-repeat: no-repeat;
+    background-position: center center;
+    
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    
+    /*
+    opacity: 0;
+    filter: alpha(opacity = 0);* 
+    transition-property : opacity;
+    transition-duration : 0.3s;
+    -moz-transition-property : opacity;
+    -moz-transition-duration : 0.3s;
+    -webkit-transition-property : opacity;
+    -webkit-transition-duration : 0.3s;
+    -o-transition-property : opacity;
+    -o-transition-duration : 0.3s;
+    */
+    
+}
+
+.gallerize .arrow-area:hover .arrow {
+    /* display: block; */
+    /*
+    opacity: 1;
+    filter: alpha(opacity = 100);
+    transition-property : opacity;
+    transition-duration : 0.3s;
+    -moz-transition-property : opacity;
+    -moz-transition-duration : 0.3s;
+    -webkit-transition-property : opacity;
+    -webkit-transition-duration : 0.3s;
+    -o-transition-property : opacity;
+    -o-transition-duration : 0.3s;
+    */
+}
+
+.gallerize .arrow-left {
+    left: 10px;
+    background-image: url(images/arrow-left.png);
+}
+.gallerize .arrow-right {
+    right: 10px;
+    background-image: url(images/arrow-right.png);
+}
 
 
 .gallerize .box {
@@ -115,80 +172,66 @@
     font-style: italic;
 }
 
-.gallerize .bar-wrapper {
+.gallerize .thumbs-wrapper {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 120px;
+    height: 100px;
+    z-index: 60;
 }
 
-.gallerize .bar {
-    width: 100%;
-    padding: 0;
-    -webkit-border-radius: 0px;
-    -moz-border-radius: 0px;
-    border-radius: 0px;
-
-    background-color: black;
-    background-color: rgba(0, 0, 0, 0.5);
-    opacity: 1.0;    
-}
-
-.gallerize .bar .padding {
-    padding: 10px;
-    /*overflow: hidden;*/
-}
-
-.gallerize .bar .thumbs {
+.gallerize .thumbs {
     width: 100%;
     height: 100px;
+   
     position: relative;
-    overflow: hidden;
+    background-color: #000;
 }
 
-.gallerize .bar .thumbs .scroller {
+.gallerize .thumbs .scroller {
     position: absolute;
     left: 0;
     top: 0;
     width: 10000px;
 }
 
-.gallerize .bar .thumbs .thumb {
+.gallerize .thumbs .thumb {
     position: relative;
     height: 100px;
     float: left;
     cursor: pointer;
+    opacity: 0.3;
+    filter: alpha(opacity = 30);
+    transition-property : margin-top, opacity;
+    transition-duration : 0.3s;
+    -moz-transition-property : margin-top, opacity;
+    -moz-transition-duration : 0.3s;
+    -webkit-transition-property : margin-top, opacity;
+    -webkit-transition-duration : 0.3s;
+    -o-transition-property : margin-top, opacity;
+    -o-transition-duration : 0.3s;   
 }
 
-.gallerize .bar .thumbs .thumb img {
+.gallerize .thumbs .selected {
+    margin-top: -15px;
+    opacity: 1.0;
+    filter: alpha(opacity = 100);
+    transition-property : margin-top, opacity;
+    transition-duration : 0.3s;
+    -moz-transition-property : margin-top, opacity;
+    -moz-transition-duration : 0.3s;
+    -webkit-transition-property : margin-top, opacity;
+    -webkit-transition-duration : 0.3s;
+    -o-transition-property : margin-top, opacity;
+    -o-transition-duration : 0.3s;    
+}
+
+.gallerize .thumbs .thumb img {
     height: 100px;
-	width: auto;
+    width: auto;
     margin: 0 auto;
 }
 
-.gallerize .bar .thumbs .thumb .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;    
-    z-index: 110;
-    background-color: transparent;
-    opacity: 1.0;
-}
-
-.gallerize .bar .thumbs .thumb:hover .overlay {
-    background-color: #000;
-    opacity: 0.6;
-    filter: alpha(opacity = 60);
-}
-
-.gallerize .bar .thumbs .thumb:hover .selected,
-.gallerize .bar .thumbs .thumb .selected {
-    background-color: #aaa;
-    opacity: 0.6;
-    filter: alpha(opacity = 60);
-}
 
 
