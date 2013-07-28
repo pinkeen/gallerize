@@ -48,8 +48,9 @@
 
         this.image = $('<img/>', {'class' : 'picture'});
         this.image.load($.proxy(this.onLoaded, this));
+        this.container.append(this.image);
         /* Do this after .load() to fix IE caching issues. */
-        this.image.attr('src', this.src); 
+        this.image.attr('src', this.src);
     };
 
     Picture.prototype.onLoaded = function()
@@ -161,7 +162,9 @@
             thumbsFadeDuration: 200,
             thumbsHideTimeout: 500,
             arrowsFadeDuration: 300,
-            thumbSlideDuration: 300
+            thumbSlideDuration: 300,
+            extension: null,
+            title: null
         }, settings);
 
         this.index = null;
@@ -170,7 +173,18 @@
         this.container.data('gallerize', this);
         this.open = false;
         this.fitScreen = this.settings.fitScreen;
-        this.screen = $('<div>', {'class' : 'gallerize'}).appendTo($('body'));
+        this.screen = $('<div/>', {'class' : 'gallerize'}).appendTo($('body'));
+        this.details = $('<div/>', {'class' : 'details'}).appendTo(this.screen);
+        
+        if(this.container.attr('title'))
+        {
+            this.settings.title = this.container.attr('title');
+        }
+
+        if(this.settings.title !== null)
+        {
+            $('<div/>', {'class' : 'title box'}).html(this.settings.title).appendTo(this.details);
+        }
 
         var self = this,
             elements = container.find('a > img');
@@ -207,7 +221,7 @@
         });
 
         if(this.settings.showCounter) {
-            this.counter = $('<div/>', {'class' : 'counter box'}).appendTo(this.screen);
+            this.counter = $('<div/>', {'class' : 'counter box'}).appendTo(this.details);
         }
 
         if(this.settings.showInfo) {
@@ -260,7 +274,16 @@
             .appendTo(this.screen)
             .click($.proxy(this.next, this))
             .hover(fadeToggle, fadeToggle);
+
+        if(this.settings.extension !== null)
+        {
+            if(typeof this.settings.extension !== 'function')
+            {
+                $.error('[jQuery.gallerize] The extension should be a function!');
+            }
             
+            this.settings.extension(this, screen);
+        }
     }
 
     Gallerize.prototype.setSize = function(fitScreen)
