@@ -55,6 +55,10 @@
 
     Picture.prototype.onLoaded = function()
     {
+        if(this.loaded) {
+            return;
+        }        
+        
         this.loaded = true;
         this.spinner.replaceWith(this.image);
 
