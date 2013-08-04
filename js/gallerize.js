@@ -227,10 +227,6 @@
 
         this.buttons = $('<div/>', {'class' : 'buttons'}).appendTo(this.screen);
         
-        this.buttonClose = $('<div/>', {'class' : 'btn btn-close'}).appendTo(this.buttons).click($.proxy(function() {
-            this.close();
-        }, this));
-
         if(this.settings.showResizeButton) {
             this.buttonRealSize = $('<div/>', {'class' : 'btn btn-real-size'}).appendTo(this.buttons).click($.proxy(function() {
                     this.buttonRealSize.hide();
@@ -250,6 +246,10 @@
                 this.buttonRealSize.hide();
             }
         }
+        
+        this.buttonClose = $('<div/>', {'class' : 'btn btn-close'}).appendTo(this.buttons).click($.proxy(function() {
+            this.close();
+        }, this));        
 
         var arrowsFadeDuration = this.settings.arrowsFadeDuration,
             fadeToggle = function() {
