@@ -176,7 +176,7 @@
         }
 
         if(this.settings.title !== null) {
-            $('<div/>', {'class' : 'gallery-title'}).html(this.settings.title).appendTo(this.screen);
+            $('<div/>', {'class' : 'gallery-title box'}).html(this.settings.title).appendTo(this.screen);
         }
 
         var self = this,
