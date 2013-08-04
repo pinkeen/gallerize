@@ -170,16 +170,13 @@
         this.open = false;
         this.fitScreen = this.settings.fitScreen;
         this.screen = $('<div/>', {'class' : 'gallerize'}).appendTo($('body'));
-        this.details = $('<div/>', {'class' : 'details'}).appendTo(this.screen);
         
-        if(this.container.attr('title'))
-        {
+        if(this.container.attr('title')) {
             this.settings.title = this.container.attr('title');
         }
 
-        if(this.settings.title !== null)
-        {
-            $('<div/>', {'class' : 'title box'}).html(this.settings.title).appendTo(this.details);
+        if(this.settings.title !== null) {
+            $('<div/>', {'class' : 'gallery-title'}).html(this.settings.title).appendTo(this.screen);
         }
 
         var self = this,
@@ -217,7 +214,7 @@
         });
 
         if(this.settings.showCounter) {
-            this.counter = $('<div/>', {'class' : 'counter box'}).appendTo(this.details);
+            this.counter = $('<div/>', {'class' : 'counter box'}).appendTo(this.screen);
         }
 
         if(this.settings.showInfo) {
@@ -271,10 +268,8 @@
             .click($.proxy(this.next, this))
             .hover(fadeToggle, fadeToggle);
 
-        if(this.settings.extension !== null)
-        {
-            if(typeof this.settings.extension !== 'function')
-            {
+        if(this.settings.extension !== null) {
+            if(typeof this.settings.extension !== 'function') {
                 $.error('[jQuery.gallerize] The extension should be a function!');
             }
             
@@ -310,13 +305,15 @@
                 $('<div/>', {'class' : 'overlay'})
             ).appendTo(this.thumbsInner);
 
-            picture.thumb.click({ index: index }, thumbClick);
+            picture.thumb.click({index: index}, thumbClick);
         }
         
        
         this.thumbs.mousemove({thumbs: this.thumbs, inner: this.thumbsInner, scroller: this.scroller}, function(event) {
-            if(event.data.scroller.is(':animated'))
+            if(event.data.scroller.is(':animated')) {
                 return;
+            }
+            
             var tw = event.data.thumbs.width(),
                 iw = event.data.inner.width(),
                 x;
@@ -343,7 +340,7 @@
                 }
                 
                 data.hover = true;
-                event.data.bar.stop().fadeIn(event.data.duration, 'linear');
+                event.data.bar.stop().fadeIn(event.data.duration);
             });
 
            this.thumbsWrapper.mouseleave({bar : this.thumbs, duration: this.settings.thumbsFadeDuration, timeout: this.settings.thumbsHideTimeout}, function(event) {
@@ -352,7 +349,7 @@
                     if(event.data.bar.data('gallerize').hover) {
                         return;
                     }
-                    event.data.bar.stop().fadeOut(event.data.duration, 'linear');
+                    event.data.bar.stop().fadeOut(event.data.duration);
                 }, event.data.timeout);
             });
         }
