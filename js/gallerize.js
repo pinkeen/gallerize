@@ -1,38 +1,36 @@
-/*
-                                                                         
-    Gallerize - A jQuery Fullscreen Gallery Plugin                         
-    2012 (c) Filip Sobalski <pinkeen@gmail.com>                            
-                                                                        
-    Permission is hereby granted, free of charge, to any person obtaining  
-    a copy of this software and associated documentation files (the        
-    "Software"), to deal in the Software without restriction, including    
-    without limitation the rights to use, copy, modify, merge, publish,    
-    distribute, sublicense, and/or sell copies of the Software, and to     
-    permit persons to whom the Software is furnished to do so, subject to  
-    the following conditions:                                              
-                                                                         
-    The above copyright notice and this permission notice shall be         
-    included in all copies or substantial portions of the Software.        
-                                                                         
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,        
-    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF     
-    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND                  
-    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
-    LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
-    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION  
-    WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.        
-                                                                         
-*/
-
+/*!
+ *   Gallerize - A jQuery Fullscreen Gallery Plugin                         
+ *   2012 (c) Filip Sobalski <pinkeen@gmail.com>                            
+ *                                                                       
+ *   Permission is hereby granted, free of charge, to any person obtaining  
+ *   a copy of this software and associated documentation files (the        
+ *   "Software"), to deal in the Software without restriction, including    
+ *   without limitation the rights to use, copy, modify, merge, publish,    
+ *   distribute, sublicense, and/or sell copies of the Software, and to     
+ *   permit persons to whom the Software is furnished to do so, subject to  
+ *   the following conditions:                                              
+ *                                                                        
+ *   The above copyright notice and this permission notice shall be         
+ *   included in all copies or substantial portions of the Software.        
+ *                                                                        
+ *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,        
+ *   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF     
+ *   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND                  
+ *   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
+ *   LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
+ *   OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION  
+ *   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.        
+ */
 (function($)
 {
+    "use strict";
+ 
     /*** Picture class ***/
 
-    function Picture(src, container, settings)
-    {
+    function Picture(src, container, settings) {
         this.src = src;
         this.loaded = false;
-        this.spinner = $('<div/>', {'class' : 'spinner'});
+        this.spinner = $(settings.spinner);
         this.fitScreen = settings.fitScreen;
         this.visible = false;
         this.container = container;
@@ -40,8 +38,7 @@
         this.fadeDuration = settings.imageFadeDuration;
     }
 
-    Picture.prototype.load = function()
-    {
+    Picture.prototype.load = function() {
         if(this.loaded) {
             return;
         }
@@ -53,8 +50,7 @@
         this.image.attr('src', this.src);
     };
 
-    Picture.prototype.onLoaded = function()
-    {
+    Picture.prototype.onLoaded = function() {
         if(this.loaded) {
             return;
         }        
@@ -68,8 +64,7 @@
         }
     };
 
-    Picture.prototype.setSize = function(fitScreen)
-    {
+    Picture.prototype.setSize = function(fitScreen) {
         this.fitScreen = fitScreen;
 
         if(!this.loaded) {
@@ -79,8 +74,7 @@
         this.resize();
     };
 
-    Picture.prototype.resize = function(fitScreen)
-    {
+    Picture.prototype.resize = function(fitScreen) {
         if(!this.loaded) {
             return;
         }
@@ -112,8 +106,7 @@
         }
     };
 
-    Picture.prototype.show = function(instant)
-    {
+    Picture.prototype.show = function(instant) {
         instant = typeof instant == 'undefined' ? false : instant;
         
         if(this.loaded) {
@@ -131,8 +124,7 @@
         this.visible = true;
     };
 
-    Picture.prototype.hide = function(instant)
-    {
+    Picture.prototype.hide = function(instant) {
         instant = typeof instant == 'undefined' ? false : instant;
         
         if(this.loaded) {
@@ -150,8 +142,7 @@
     
     /*** Gallerize class ****/
     
-    function Gallerize(container, settings)
-    {
+    function Gallerize(container, settings) {
         this.settings = $.extend(true, {
             fitScreen : true,
             wrap: true,
@@ -168,7 +159,8 @@
             arrowsFadeDuration: 300,
             thumbSlideDuration: 300,
             extension: null,
-            title: null
+            title: null,
+            spinner: '<div class="spinner"></div>'
         }, settings);
 
         this.index = null;
@@ -198,17 +190,17 @@
         }
         
         elements.each(function() {
-            var img = $(this);
-            var a = img.parent();
-
-            var picture = new Picture(a.attr('href'), self.screen, self.settings);
+            var img = $(this),
+                a = img.parent(),
+                picture = new Picture(a.attr('href'), self.screen, self.settings);
 
             picture.thumbSrc = img.attr('src');
             picture.title = a.attr('title');
             picture.description = img.attr('alt');
 
-            if(self.settings.preloadAll)
+            if(self.settings.preloadAll) {
                 picture.load();
+            }
 
             var index = self.pictures.push(picture) - 1;
 
@@ -239,7 +231,7 @@
         this.buttons = $('<div/>', {'class' : 'buttons'}).appendTo(this.screen);
         
         this.buttonClose = $('<div/>', {'class' : 'btn btn-close'}).appendTo(this.buttons).click($.proxy(function() {
-                this.close();
+            this.close();
         }, this));
 
         if(this.settings.showResizeButton) {
@@ -262,8 +254,8 @@
             }
         }
 
-        var arrowsFadeDuration = this.settings.arrowsFadeDuration;
-        var fadeToggle = function() {
+        var arrowsFadeDuration = this.settings.arrowsFadeDuration,
+            fadeToggle = function() {
             $(this).find('.arrow').stop().fadeToggle(arrowsFadeDuration);
         };
         
@@ -290,8 +282,7 @@
         }
     }
 
-    Gallerize.prototype.setSize = function(fitScreen)
-    {
+    Gallerize.prototype.setSize = function(fitScreen) {
         var i;
         this.fitScreen = fitScreen;
         
@@ -300,18 +291,16 @@
         }
     };
 
-    Gallerize.prototype.createThumbs = function()
-    {
+    Gallerize.prototype.createThumbs = function() {
         this.thumbsWrapper = $('<div/>', {'class' : 'thumbs-wrapper'}).appendTo(this.screen);
         this.thumbs = $('<div/>', {'class' : 'thumbs'}).appendTo(this.thumbsWrapper);
         this.scroller = $('<div/>', {'class' : 'scroller'}).appendTo(this.thumbs);
         this.thumbsInner = $('<div/>').appendTo(this.scroller).css('float', 'left');
 
-        var index;
-
-        var thumbClick = $.proxy(function(event) {
-            this.switchPicture(parseInt(event.data.index, 10));
-        }, this);
+        var index,
+            thumbClick = $.proxy(function(event) {
+                this.switchPicture(parseInt(event.data.index, 10));
+            }, this);
 
         for(index = 0; index < this.pictures.length; index++) {
             var picture = this.pictures[index];
@@ -328,14 +317,15 @@
         this.thumbs.mousemove({thumbs: this.thumbs, inner: this.thumbsInner, scroller: this.scroller}, function(event) {
             if(event.data.scroller.is(':animated'))
                 return;
-            var tw = event.data.thumbs.width();
-            var iw = event.data.inner.width();
+            var tw = event.data.thumbs.width(),
+                iw = event.data.inner.width(),
+                x;
 
             if(iw <= tw) {
                 return;
             }
             
-            var x = (event.clientX / tw) * (iw - tw);
+            x = (event.clientX / tw) * (iw - tw);
             event.data.scroller.css('left', -x + 'px');
         });
 
@@ -368,13 +358,13 @@
         }
     };
     
-    Gallerize.prototype.show = function(index)
-    {
+    Gallerize.prototype.show = function(index) {
         if(this.open) {
             return this.switchPicture(index);
         }
             
         this.open = true;
+        
         $(document).bind('keyup.gallerize', $.proxy(this.onKeyUp, this));
         $(window).bind('resize.gallerize', $.proxy(this.onResize, this));
         this.screen.bind('mousewheel.gallerize', $.proxy(this.onMouseWheel, this));
@@ -391,8 +381,7 @@
         }
     };
 
-    Gallerize.prototype.close = function()
-    {
+    Gallerize.prototype.close = function() {
         if(!this.open) {
             return;
         }
@@ -410,8 +399,7 @@
         }
     };    
 
-    Gallerize.prototype.switchPicture = function(index, instant)
-    {
+    Gallerize.prototype.switchPicture = function(index, instant) {
         if(typeof index == 'undefined') {
             return;
         }
@@ -486,8 +474,7 @@
         }
     };
     
-    Gallerize.prototype.getNextIndex = function()
-    {
+    Gallerize.prototype.getNextIndex = function() {
         var index = this.index + 1;
         
         if(index == this.pictures.length) {
@@ -501,8 +488,7 @@
         return index;
     };
 
-    Gallerize.prototype.getPreviousIndex = function()
-    {
+    Gallerize.prototype.getPreviousIndex = function() {
         var index = this.index - 1;
 
         if(index < 0)
@@ -520,8 +506,7 @@
     Gallerize.prototype.next = function() { this.switchPicture(this.getNextIndex()); };
     Gallerize.prototype.previous = function() { this.switchPicture(this.getPreviousIndex()); };
 
-    Gallerize.prototype.onMouseWheel = function(event, delta, deltaX, deltaY)
-    {
+    Gallerize.prototype.onMouseWheel = function(event, delta, deltaX, deltaY) {
         event.preventDefault();
         
         if(deltaY > 0) {
@@ -533,8 +518,7 @@
         }
     };
 
-    Gallerize.prototype.onResize = function()
-    {
+    Gallerize.prototype.onResize = function() {
         if(this.index === null) {
             return;
         }
@@ -542,8 +526,7 @@
         this.pictures[this.index].resize();
     };
  
-    Gallerize.prototype.onKeyUp = function(event)
-    {
+    Gallerize.prototype.onKeyUp = function(event) {
         if(event.which == 27) {
             event.preventDefault();
             this.close();
@@ -560,8 +543,7 @@
         }
     };
 
-    Gallerize.prototype.enableFullScreen = function()
-    {
+    Gallerize.prototype.enableFullScreen = function() {
         var screen = this.screen.get(0);
         
         if(typeof screen.requestFullScreen != 'undefined') {
@@ -575,9 +557,7 @@
         }
     };
 
-    Gallerize.prototype.disableFullScreen = function()
-    {
-
+    Gallerize.prototype.disableFullScreen = function() {
         if(typeof document.cancelFullScreen != 'undefined') {
             document.cancelFullScreen();
         }
@@ -592,16 +572,14 @@
 
     /*** jQuery boilerplate ***/
 
-    function init(settings)
-    {
+    function init(settings) {
         return this.each(function() {
             var container = $(this);
             container.data('gallerize', new Gallerize(container, settings));
         });
     }
 
-    $.fn.gallerize = function(method)
-    {
+    $.fn.gallerize = function(method) {
         if(this.length == 0) {
             return this;
         }
@@ -610,8 +588,7 @@
             return init.apply(this, arguments);
         }
 
-        switch(method)
-        {
+        switch(method) {
             case 'show':
                 if(this.length != 1) {
                     $.error('[jQuery.gallerize] You cannot show multiple galleries at once!');

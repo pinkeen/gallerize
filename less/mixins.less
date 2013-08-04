@@ -1,0 +1,29 @@
+.transition(@string) {
+    -moz-transition: @string;
+    -webkit-transition: @string;
+    -ms-transition: @string;
+    -o-transition: @string;
+    transition: @string;
+}
+
+.opacity(@opacity) {
+    -webkit-opacity: @opacity;
+    -moz-opacity: @opacity;
+    opacity: @opacity;
+    
+    @opacityPercentage: @opacity * 100;
+    -ms-filter: ~"progid:DXImageTransform.Microsoft.Alpha(opacity=(@{opacityPercentage}))"; 
+    filter: ~"alpha(opacity = (@{opacityPercentage}))";    
+}
+
+.box-shadow (@string) {
+    -webkit-box-shadow: @string;
+    -moz-box-shadow:    @string;
+    box-shadow:         @string;
+} 
+
+.border-radius (@radius) {
+    -webkit-border-radius: @radius;
+    -moz-border-radius: @radius;
+    border-radius: @radius;
+} 

@@ -1,0 +1,207 @@
+@import "mixins.less";
+
+@imgpath: "../img/";
+@zindex: 1000;
+
+.gallerize {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+
+    .picture {
+        display: none;
+        position: absolute;
+    }
+
+    .spinner {
+        display: none;
+        background: transparent url(~"@{imgpath}spinner.gif") no-repeat center center;
+        width: 100%;
+        height: 100%;
+    }
+
+    .btn {
+        background-color: black;
+        background-color: rgba(0, 0, 0, 0.5);    
+        background-image: url(~"@{imgpath}icons.png");
+        background-repeat: no-repeat;
+
+        padding: 5px;
+        
+        width: 20px;
+        height: 20px;
+
+        cursor: pointer;
+       
+        .border-radius(5px);
+
+        margin-bottom: 10px;
+    }
+
+    .btn:hover {
+        background-color: #666;
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .buttons {
+        position: absolute;
+        width: 30px;
+        height: 70px;
+        right: 10px;
+        top: 10px;
+        z-index: (@zindex + 50);
+    }
+
+    .btn-close { background-position: -55px 5px; }
+    .btn-real-size { background-position: -25px 5px; }
+    .btn-fit-screen { background-position: 5px 5px; }
+
+    .arrow-area {
+        position: absolute;
+        top: 10%;
+        z-index: (@zindex + 40);
+        height: 80%;
+        width: 20%;
+        cursor: pointer;
+    }
+
+    .arrow-area-left { left: 0; }
+    .arrow-area-right { right: 0; }
+
+    .arrow {
+        display: none;
+
+        position: absolute;
+        top: 50%;
+        margin-top: -75px;
+        width: 120px;
+        height: 150px;
+
+        padding: 15px;
+        
+        background-color: black;
+        background-color: rgba(0, 0, 0, 0.5);
+        background-repeat: no-repeat;
+        background-position: center center;
+        
+        .border-radius(15px);
+    }
+
+    .arrow-area:hover .arrow {
+        
+    }
+
+    .arrow-left {
+        left: 10px;
+        background-image: url(~"@{imgpath}arrow-left.png");
+    }
+
+    .arrow-right {
+        right: 10px;
+        background-image: url(~"@{imgpath}arrow-right.png");
+    }
+
+
+    .box {
+        position: absolute;
+        z-index: (@zindex + 100);
+        padding: 5px;
+        background-color: black;
+        background-color: rgba(0, 0, 0, 0.6);
+        opacity: 0.83;
+        color: #fff;
+
+        font-family: sans-serif;
+        font-size: 14px;
+
+        .border-radius(5px);
+    }
+
+    .details {
+        z-index: (@zindex + 100);
+        position: absolute;
+        top: 10px;
+        left: 10px;
+    }
+
+    .details > .counter {
+        position: static;
+        font-weight: bold;
+        float: left;
+    }
+
+    .details > .title {
+        position: static;
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .info {
+        top: 10px;
+        right: 50px;
+        display: none;
+        text-align: right;
+        max-width: 25%;
+    }
+
+    .info .title {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .info .description {
+        text-align: justify;
+        font-style: italic;
+    }
+
+    .thumbs-wrapper {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100px;
+        z-index: (@zindex + 60);
+    }
+
+    .thumbs {
+        width: 100%;
+        height: 100px;
+       
+        position: relative;
+        background-color: #000;
+    }
+
+    .thumbs .scroller {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 10000px;
+    }
+
+    .thumbs .thumb {
+        position: relative;
+        height: 100px;
+        float: left;
+        cursor: pointer;
+        .opacity(0.3);
+        .transition(~"all 0.3s linear");
+    }
+
+    .thumbs .selected {
+        margin-top: -15px;
+        .opacity(1.0);
+        .transition(~"all 0.3s linear");
+    }
+
+    .thumbs .thumb img {
+        height: 100px;
+        width: auto;
+        margin: 0 auto;
+    }
+}
+
