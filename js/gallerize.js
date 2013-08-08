@@ -301,17 +301,17 @@
             var picture = this.pictures[index];
             
             picture.thumb = $('<div/>', {'class' : 'thumb'}).append(
-                $('<img/>', {'src' : picture.thumbSrc}),
+                $('<img/>', {'src' : picture.thumbSrc}).on('dragstart', function() { return false; }),
                 $('<div/>', {'class' : 'overlay'})
             ).appendTo(this.thumbsInner);
-
+            
             picture.thumb.click({index: index}, thumbClick);
         }
         
        
         this.thumbs.mousemove({thumbs: this.thumbs, inner: this.thumbsInner, scroller: this.scroller}, function(event) {
             if(event.data.scroller.is(':animated')) {
-                return;
+                event.data.scroller.stop();
             }
             
             var tw = event.data.thumbs.width(),
