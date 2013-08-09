@@ -425,9 +425,9 @@
                 newpos = -startpos;
             }
             
-            if(newpos != pos)
+            if(newpos != pos) {
                 this.scroller.stop(true).animate({'left': newpos + 'px'}, this.settings.thumbSlideDuration, 'linear');
-                
+            }
             
             if(oldPicture !== null) {
                 oldPicture.thumb.toggleClass('selected');
