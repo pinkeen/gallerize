@@ -43,7 +43,7 @@
             return;
         }
 
-        this.image = $('<img/>', {'class' : 'picture'});
+        this.image = $('<img/>', {'class' : 'picture picture-previous'});
         this.image.load($.proxy(this.onLoaded, this));
         this.container.append(this.image);
         /* Do this after .load() to fix IE caching issues. */
@@ -110,11 +110,9 @@
         instant = typeof instant == 'undefined' ? false : instant;
         
         if(this.loaded) {
-            if(instant) {
-                this.image.show();
-            } else {
-                this.image.fadeIn(this.fadeDuration, 'linear');
-            }
+            this.image.show();
+            this.image.addClass('picture-current');
+            
             this.resize();
         }
         else {
@@ -128,11 +126,7 @@
         instant = typeof instant == 'undefined' ? false : instant;
         
         if(this.loaded) {
-            if(instant) {
-                this.image.hide();
-            } else {
-                this.image.fadeOut(this.fadeDuration, 'linear');
-            }
+            this.image.removeClass('picture-current');
         } else {
             this.spinner.hide();
         }
