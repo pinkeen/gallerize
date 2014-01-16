@@ -1,41 +1,31 @@
 /*!
  *   Gallerize - A jQuery Fullscreen Gallery Plugin                         
  *   2012 (c) Filip Sobalski <pinkeen@gmail.com>                            
- *                                                                       
- *   Permission is hereby granted, free of charge, to any person obtaining  
- *   a copy of this software and associated documentation files (the        
- *   "Software"), to deal in the Software without restriction, including    
- *   without limitation the rights to use, copy, modify, merge, publish,    
- *   distribute, sublicense, and/or sell copies of the Software, and to     
- *   permit persons to whom the Software is furnished to do so, subject to  
- *   the following conditions:                                              
  *                                                                        
- *   The above copyright notice and this permission notice shall be         
- *   included in all copies or substantial portions of the Software.        
- *                                                                        
- *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,        
- *   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF     
- *   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND                  
- *   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
- *   LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
- *   OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION  
- *   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.        
+ *   Licensed under the MIT License.
  */
 (function($)
 {
     "use strict";
  
-    /*** Picture class ***/
+    /* 
+     * Picture class
+     * 
+     * Responsible for handling a single picture. 
+     */
 
-    function Picture(src, container, settings) {
-        this.src = src;
+    function Picture(attrs, container, settings) {
+        this.src = attrs.src;
+        this.thumb = attrs.thumb;
+        this.title = attrs.title;
+        this.description = attrs.description;
+        
         this.loaded = false;
-        this.spinner = $(settings.spinner);
-        this.fitScreen = settings.fitScreen;
         this.visible = false;
+        this.fitScreen = settings.fitScreen;
         this.container = container;
-        this.container.append(this.spinner);
-        this.fadeDuration = settings.imageFadeDuration;
+        
+        this.spinner = $('<div class="spinner"></div>').appendTo(this.container);
     }
 
     Picture.prototype.load = function() {
@@ -43,11 +33,29 @@
             return;
         }
 
-        this.image = $('<img/>', {'class' : 'picture picture-previous'});
+        this.wrapper = $('<div class="picture"></div>');
+        
+        if(this.title || this.description) {
+            var info = $('<div class="info box"></div>').appendTo(this.wrapper);
+            
+            if(this.title) {
+                $('<div class="title"></div>')
+                    .html(this.title)
+                    .appendTo(info);
+            }
+            
+            if(this.description) {
+                $('<div class="description"></div>')
+                    .html(this.description)
+                    .appendTo(info);
+            }
+        }
+        
+        this.image = $('<img/>').appendTo(this.wrapper);
         this.image.load($.proxy(this.onLoaded, this));
-        this.container.append(this.image);
         /* Do this after .load() to fix IE caching issues. */
         this.image.attr('src', this.src);
+        this.container.append(this.wrapper);
     };
 
     Picture.prototype.onLoaded = function() {
@@ -56,7 +64,11 @@
         }        
         
         this.loaded = true;
-        this.spinner.replaceWith(this.image);
+        this.spinner.replaceWith(this.wrapper);
+        
+        this.width = this.image[0].width;
+        this.height = this.image[0].height;
+        this.ratio = this.width / this.height;
 
         if(this.visible) {
             this.show();
@@ -79,40 +91,40 @@
             return;
         }
 
-        if(!fitScreen) {
-            this.image.css('width', 'auto').css('height', 'auto');
-        }
+        var cWidth = this.container.width(),
+            cHeight = this.container.height(),
+            cRatio = cWidth / cHeight,
+            nWidth, nHeight, nTop, nLeft;
         
-        var containerWidth = this.container.width(),
-            containerHeight = this.container.height(),
-            imageWidth = this.image.width(),
-            imageHeight = this.image.height();
-        
-        if(this.fitScreen || imageHeight > containerHeight || imageWidth > containerWidth) {
-            var containerRatio = containerWidth / containerHeight,
-                imageRatio = imageWidth / imageHeight;
-
-            if(imageRatio > containerRatio) {
-                this.image.css('width', '100%')
-                          .css('top', (containerHeight - this.image.height()) / 2.0 + 'px').css('left', '0');
+        if(this.fitScreen || this.height > cHeight || this.width > cWidth) {
+            if(this.ratio > cRatio) {
+                nWidth = cWidth;
+                nHeight = nWidth / this.ratio;
+                nLeft = 0;
+                nTop = (cHeight - nHeight) / 2.0;
             } else {
-                this.image.css('height', '100%')
-                          .css('top', '0').css('left', (containerWidth - this.image.width()) / 2.0 + 'px');
+                nHeight = cHeight;
+                nWidth = nHeight * this.ratio;
+                nTop = 0;
+                nLeft = (cWidth - nWidth) / 2.0;
             }
         }
         else if(!this.fitScreen) {
-            this.image.css('top', (containerHeight - imageHeight) / 2.0 + 'px')
-                      .css('left', (containerWidth - imageWidth) / 2.0 + 'px');
+            nWidth = this.width;
+            nHeight = this.height;
+            nLeft = (cWidth - nWidth) / 2.0;
+            nTop = (cHeight - nHeight) / 2.0;
         }
+        
+        this.image.css('width', Math.floor(nWidth) + 'px');
+        this.image.css('height', Math.floor(nHeight) + 'px');
+        this.wrapper.css('left', Math.floor(nLeft) + 'px');
+        this.wrapper.css('top', Math.floor(nTop) + 'px');
     };
 
-    Picture.prototype.show = function(instant) {
-        instant = typeof instant == 'undefined' ? false : instant;
-        
+    Picture.prototype.show = function() {
         if(this.loaded) {
-            this.image.show();
-            this.image.addClass('picture-current');
-            
+            this.wrapper.addClass('picture-current');
             this.resize();
         }
         else {
@@ -122,11 +134,9 @@
         this.visible = true;
     };
 
-    Picture.prototype.hide = function(instant) {
-        instant = typeof instant == 'undefined' ? false : instant;
-        
+    Picture.prototype.hide = function() {
         if(this.loaded) {
-            this.image.removeClass('picture-current');
+            this.wrapper.removeClass('picture-current');
         } else {
             this.spinner.hide();
         }
@@ -134,7 +144,11 @@
         this.visible = false;
     };
     
-    /*** Gallerize class ****/
+    /*
+     * Gallerize class 
+     * 
+     * Prepares and handles a single instance of the gallery.
+     */
     
     function Gallerize(container, settings) {
         this.settings = $.extend(true, {
@@ -145,16 +159,7 @@
             showCounter: true,
             showInfo: true,
             showThumbs: true,
-            showResizeButton: true,
-            imageFadeDuration: 0,            
-            thumbsAlwaysVisible: false,
-            thumbsFadeDuration: 200,
-            thumbsHideTimeout: 500,
-            arrowsFadeDuration: 300,
-            thumbSlideDuration: 300,
-            extension: null,
-            title: null,
-            spinner: '<div class="spinner"></div>'
+            thumbSlideDuration: 300
         }, settings);
 
         this.index = null;
@@ -163,16 +168,8 @@
         this.container.data('gallerize', this);
         this.open = false;
         this.fitScreen = this.settings.fitScreen;
-        this.screen = $('<div/>', {'class' : 'gallerize'}).appendTo($('body'));
+        this.screen = $('<div class="gallerize"></div>').appendTo($('body'));
         
-        if(this.container.attr('title')) {
-            this.settings.title = this.container.attr('title');
-        }
-
-        if(this.settings.title !== null) {
-            $('<div/>', {'class' : 'gallery-title box'}).html(this.settings.title).appendTo(this.screen);
-        }
-
         var self = this,
             elements = container.find('a > img');
 
@@ -183,107 +180,61 @@
         elements.each(function() {
             var img = $(this),
                 a = img.parent(),
-                picture = new Picture(a.attr('href'), self.screen, self.settings);
-
-            picture.thumbSrc = img.attr('src');
-            picture.title = a.attr('title');
-            picture.description = img.attr('alt');
+                attrs = {
+                    src: a.attr('href'),
+                    thumb: img.attr('src'),
+                    title: a.attr('title'),
+                    description: img.attr('alt')
+                },
+                picture = new Picture(attrs, self.screen, self.settings);
 
             if(self.settings.preloadAll) {
                 picture.load();
             }
 
-            var index = self.pictures.push(picture) - 1;
-
             a.data('gallerize', {
                 gallerize: self,
-                index: index
+                index: self.pictures.push(picture) - 1
             });
            
             a.click(function(event) {
-                event.preventDefault();
                 var data = $(this).data('gallerize');
-                $.proxy(data.gallerize.show, data.gallerize)(data.index);
+                event.preventDefault();
+                data.gallerize.show(data.index);
             });
         });
-
-        if(this.settings.showCounter) {
-            this.counter = $('<div/>', {'class' : 'counter box'}).appendTo(this.screen);
-        }
-
-        if(this.settings.showInfo) {
-            this.info = $('<div/>', {'class' : 'info box'}).appendTo(this.screen);
-        }
 
         if(this.settings.showThumbs) {
             this.createThumbs();
         }
 
-        this.buttons = $('<div/>', {'class' : 'buttons'}).appendTo(this.screen);
-        
-        if(this.settings.showResizeButton) {
-            this.buttonRealSize = $('<div/>', {'class' : 'btn btn-real-size'}).appendTo(this.buttons).click($.proxy(function() {
-                    this.buttonRealSize.hide();
-                    this.buttonFitScreen.show();
-                    this.setSize(false);
-            }, this));
-
-            this.buttonFitScreen = $('<div/>', {'class' : 'btn btn-fit-screen'}).appendTo(this.buttons).click($.proxy(function() {
-                    this.buttonRealSize.show();
-                    this.buttonFitScreen.hide();
-                    this.setSize(true);
-            }, this));
-
-            if(this.fitScreen) {
-                this.buttonFitScreen.hide();
-            } else {
-                this.buttonRealSize.hide();
-            }
-        }
-        
-        this.buttonClose = $('<div/>', {'class' : 'btn btn-close'}).appendTo(this.buttons).click($.proxy(function() {
-            this.close();
-        }, this));        
-
-        var arrowsFadeDuration = this.settings.arrowsFadeDuration,
-            fadeToggle = function() {
-            $(this).find('.arrow').stop().fadeToggle(arrowsFadeDuration);
-        };
-        
-        $('<div/>', {'class' : 'arrow-area arrow-area-left'})
-            .append($('<div/>', {'class' : 'arrow arrow-left'}))
+        $('<div class="buttons"></div>')
             .appendTo(this.screen)
-            .click($.proxy(this.previous, this))
-            .hover(fadeToggle, fadeToggle);
-            
-        $('<div/>', {'class' : 'arrow-area arrow-area-right'})
-            .append($('<div/>', {'class' : 'arrow arrow-right'}))
-            .appendTo(this.screen)
-            .click($.proxy(this.next, this))
-            .hover(fadeToggle, fadeToggle);
+            .append(
+                $('<div class="btn btn-close"></div>').click(function() { self.close(); })
+            );
 
-        if(this.settings.extension !== null) {
-            if(typeof this.settings.extension !== 'function') {
-                $.error('[jQuery.gallerize] The extension should be a function!');
-            }
+        $('<div class="arrow-area arrow-area-left"><div class="arrow arrow-left"></div></div>')
+            .appendTo(this.screen)
+            .click(function() { self.previous(); });
             
-            this.settings.extension(this, screen);
-        }
+        $('<div class="arrow-area arrow-area-right"><div class="arrow arrow-right"></div></div>')
+            .appendTo(this.screen)
+            .click(function() { self.next(); });
     }
 
     Gallerize.prototype.setSize = function(fitScreen) {
-        var i;
         this.fitScreen = fitScreen;
         
-        for(i = 0; i < this.pictures.length; i++) {
+        for(var i = 0; i < this.pictures.length; i++) {
             this.pictures[i].setSize(fitScreen);
         }
     };
 
     Gallerize.prototype.createThumbs = function() {
-        this.thumbsWrapper = $('<div/>', {'class' : 'thumbs-wrapper'}).appendTo(this.screen);
-        this.thumbs = $('<div/>', {'class' : 'thumbs'}).appendTo(this.thumbsWrapper);
-        this.scroller = $('<div/>', {'class' : 'scroller'}).appendTo(this.thumbs);
+        this.thumbsWrapper = $('<div class="thumbs-wrapper"></div>').appendTo(this.screen);
+        this.thumbs = $('<div class="thumbs"></div>').appendTo(this.thumbsWrapper);
+        this.scroller = $('<div class="scroller"></div>').appendTo(this.thumbs);
         this.thumbsInner = $('<div/>').appendTo(this.scroller).css('float', 'left');
 
         var index,
@@ -294,9 +245,9 @@
         for(index = 0; index < this.pictures.length; index++) {
             var picture = this.pictures[index];
             
-            picture.thumb = $('<div/>', {'class' : 'thumb'}).append(
-                $('<img/>', {'src' : picture.thumbSrc}).on('dragstart', function() { return false; }),
-                $('<div/>', {'class' : 'overlay'})
+            picture.thumb = $('<div class="thumb"></di>').append(
+                $('<img/>', {'src' : picture.thumb}).on('dragstart', function() { return false; }),
+                $('<div class="overlay"></div>')
             ).appendTo(this.thumbsInner);
             
             picture.thumb.click({index: index}, thumbClick);
@@ -316,36 +267,12 @@
                 return;
             }
             
-            x = (event.clientX / tw) * (iw - tw);
+            x = Math.round((event.clientX / tw) * (iw - tw));
             event.data.scroller.css('left', -x + 'px');
         });
 
         if(this.settings.thumbsAlwaysVisible) {
             this.thumbs.show();
-        } else {
-            this.thumbs.hide();
-            this.thumbs.data('gallerize', {hover: false});
-            
-            this.thumbsWrapper.mouseover({bar : this.thumbs, duration: this.settings.thumbsFadeDuration}, function(event) {
-                var data = event.data.bar.data('gallerize');
-                
-                if(data.hover) {
-                    return;
-                }
-                
-                data.hover = true;
-                event.data.bar.stop().fadeIn(event.data.duration);
-            });
-
-           this.thumbsWrapper.mouseleave({bar : this.thumbs, duration: this.settings.thumbsFadeDuration, timeout: this.settings.thumbsHideTimeout}, function(event) {
-                event.data.bar.data('gallerize').hover = false;
-                setTimeout(function() {
-                    if(event.data.bar.data('gallerize').hover) {
-                        return;
-                    }
-                    event.data.bar.stop().fadeOut(event.data.duration);
-                }, event.data.timeout);
-            });
         }
     };
     
@@ -390,7 +317,7 @@
         }
     };    
 
-    Gallerize.prototype.switchPicture = function(index, instant) {
+    Gallerize.prototype.switchPicture = function(index) {
         if(typeof index == 'undefined') {
             return;
         }
@@ -435,34 +362,10 @@
         this.pictures[this.getPreviousIndex()].load();
         
         if(oldPicture !== null) {
-            oldPicture.hide(instant);
+            oldPicture.hide();
         }
 
-        picture.show(instant);
-
-        if(this.settings.showCounter) {
-            this.counter.html((this.index + 1) + ' / ' + this.pictures.length);
-        }
-
-        if(this.settings.showInfo) {
-            if(picture.description || picture.title) {
-                this.info.html('');
-                
-                if(picture.title) {
-                    $('<div/>', {'class' : 'title'}).html(picture.title).appendTo(this.info);
-                }
-
-                if(picture.description) {
-                    $('<div/>', {'class' : 'description'}).html(picture.description).appendTo(this.info);
-                }
-
-                if(!this.info.is(':visible')) {
-                    this.info.fadeIn(this.settings.imageFadeDuration, 'linear');
-                }
-            } else if(this.info.is(':visible')) {
-                this.info.fadeOut(this.settings.imageFadeDuration, 'linear');
-            }
-        }
+        picture.show();
     };
     
     Gallerize.prototype.getNextIndex = function() {
@@ -561,7 +464,9 @@
     };
     
 
-    /*** jQuery boilerplate ***/
+    /*
+     * jQuery boilerplate 
+     */
 
     function init(settings) {
         return this.each(function() {

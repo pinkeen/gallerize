@@ -4,7 +4,8 @@
         <title>Gallerize Demo</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         
-        <link rel='stylesheet/less' href='../less/gallerize.less' type='text/css' media='all' />
+        <link rel='stylesheet/less' href='../less/gallerize.less' type='text/css' media='all'/>
+        <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'/>
                 
         <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js'></script>
         <script src='http://cdnjs.cloudflare.com/ajax/libs/less.js/1.4.1/less.min.js'></script>
@@ -13,7 +14,7 @@
         <script src='../js/gallerize.js' type='text/javascript'></script>
     </head>
     <body>
-        <div id="gallery" title="Gallerize Demo Gallery">
+        <div id="gallery">
             <a title="Water Drops On Deep Green Leaf" href="pictures/1.jpg">
                 <img alt="Taken using a macro lens for the iPhone 4." src="thumbs/1.jpg"/>
             </a>
@@ -67,8 +68,7 @@
         <script>
             $(document).ready(function() {
                 $('#gallery').gallerize({
-                    preloadAll: true,
-                    imageFadeDuration: 200
+                    preloadAll: true
                 });
 
                 $('#show-button').click(function(e) {
