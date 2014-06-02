@@ -156,7 +156,6 @@
             wrap: true,
             fullscreen: false,
             preloadAll: false,
-            showCounter: true,
             showInfo: true,
             showThumbs: true,
             thumbSlideDuration: 300
@@ -309,7 +308,6 @@
         $(document).unbind('keyup.gallerize');
         $(window).unbind('resize.gallerize');
         this.screen.unbind('mousewheel.gallerize');
-
         this.screen.hide();
 
         if(this.settings.fullscreen) {
@@ -385,8 +383,7 @@
     Gallerize.prototype.getPreviousIndex = function() {
         var index = this.index - 1;
 
-        if(index < 0)
-        {
+        if(index < 0) {
             if(!this.settings.wrap) {
                 return this.index;
             }

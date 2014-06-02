@@ -101,14 +101,14 @@
 .glize-arrow-left {
   left: 10px;
 }
+.glize-arrow-left:before {
+  content: "‹";
+}
 .glize-arrow-right {
   right: 10px;
 }
 .glize-arrow-right:before {
   content: "›";
-}
-.glize-arrow-left:before {
-  content: "‹";
 }
 .glize-box {
   position: absolute;
