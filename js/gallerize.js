@@ -25,7 +25,7 @@
         this.fitScreen = settings.fitScreen;
         this.container = container;
         
-        this.spinner = $('<div class="spinner"></div>').appendTo(this.container);
+        this.spinner = $('<div class="glize-spinner"></div>').appendTo(this.container);
     }
 
     Picture.prototype.load = function() {
@@ -33,19 +33,19 @@
             return;
         }
 
-        this.wrapper = $('<div class="picture"></div>');
+        this.wrapper = $('<div class="glize-picture"></div>');
         
         if(this.title || this.description) {
-            var info = $('<div class="info box"></div>').appendTo(this.wrapper);
+            var info = $('<div class="glize-info glize-box"></div>').appendTo(this.wrapper);
             
             if(this.title) {
-                $('<div class="title"></div>')
+                $('<div class="glize-title"></div>')
                     .html(this.title)
                     .appendTo(info);
             }
             
             if(this.description) {
-                $('<div class="description"></div>')
+                $('<div class="glize-description"></div>')
                     .html(this.description)
                     .appendTo(info);
             }
@@ -124,7 +124,7 @@
 
     Picture.prototype.show = function() {
         if(this.loaded) {
-            this.wrapper.addClass('picture-current');
+            this.wrapper.addClass('glize-picture-current');
             this.resize();
         }
         else {
@@ -136,7 +136,7 @@
 
     Picture.prototype.hide = function() {
         if(this.loaded) {
-            this.wrapper.removeClass('picture-current');
+            this.wrapper.removeClass('glize-picture-current');
         } else {
             this.spinner.hide();
         }
@@ -208,17 +208,17 @@
             this.createThumbs();
         }
 
-        $('<div class="buttons"></div>')
+        $('<div class="glize-buttons"></div>')
             .appendTo(this.screen)
             .append(
-                $('<div class="btn btn-close"></div>').click(function() { self.close(); })
+                $('<div class="glize-btn glize-btn-close"></div>').click(function() { self.close(); })
             );
 
-        $('<div class="arrow-area arrow-area-left"><div class="arrow arrow-left"></div></div>')
+        $('<div class="glize-arrow-area glize-arrow-area-left"><div class="glize-arrow glize-arrow-left"></div></div>')
             .appendTo(this.screen)
             .click(function() { self.previous(); });
             
-        $('<div class="arrow-area arrow-area-right"><div class="arrow arrow-right"></div></div>')
+        $('<div class="glize-arrow-area glize-arrow-area-right"><div class="glize-arrow glize-arrow-right"></div></div>')
             .appendTo(this.screen)
             .click(function() { self.next(); });
     }
@@ -232,9 +232,9 @@
     };
 
     Gallerize.prototype.createThumbs = function() {
-        this.thumbsWrapper = $('<div class="thumbs-wrapper"></div>').appendTo(this.screen);
-        this.thumbs = $('<div class="thumbs"></div>').appendTo(this.thumbsWrapper);
-        this.scroller = $('<div class="scroller"></div>').appendTo(this.thumbs);
+        this.thumbsWrapper = $('<div class="glize-thumbs-wrapper"></div>').appendTo(this.screen);
+        this.thumbs = $('<div class="glize-thumbs"></div>').appendTo(this.thumbsWrapper);
+        this.scroller = $('<div class="glize-scroller"></div>').appendTo(this.thumbs);
         this.thumbsInner = $('<div/>').appendTo(this.scroller).css('float', 'left');
 
         var index,
@@ -245,9 +245,9 @@
         for(index = 0; index < this.pictures.length; index++) {
             var picture = this.pictures[index];
             
-            picture.thumb = $('<div class="thumb"></di>').append(
+            picture.thumb = $('<div class="glize-thumb"></di>').append(
                 $('<img/>', {'src' : picture.thumb}).on('dragstart', function() { return false; }),
-                $('<div class="overlay"></div>')
+                $('<div class="glize-overlay"></div>')
             ).appendTo(this.thumbsInner);
             
             picture.thumb.click({index: index}, thumbClick);
@@ -330,7 +330,7 @@
             picture = this.pictures[index];
 
         if(this.settings.showThumbs) {
-            picture.thumb.toggleClass('selected');
+            picture.thumb.toggleClass('glize-selected');
             
             var pos = this.scroller.position().left,
                 startpos = picture.thumb.position().left,
@@ -351,7 +351,7 @@
             }
             
             if(oldPicture !== null) {
-                oldPicture.thumb.toggleClass('selected');
+                oldPicture.thumb.toggleClass('glize-selected');
             }
         }
 
