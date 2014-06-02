@@ -1,0 +1,11 @@
+{
+    "name": "gallerize",
+    "version": "0.9.0",
+    "main": "js/gallerize.js",
+    "ignore": [
+        "demo"
+    ],
+    "dependencies": {
+        "jquery": "~2.1.1"
+    }
+}
