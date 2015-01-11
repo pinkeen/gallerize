@@ -60,10 +60,9 @@
   right: 0;
   bottom: 0;
   z-index: 1060;
-  padding: 10px 0;
 }
 .glize-btn-close:before {
-  font-size: 30px;
+  font-size: 40px;
   content: "×";
 }
 .glize-arrow-area {
@@ -94,8 +93,13 @@
   -webkit-border-radius: 15px;
   -moz-border-radius: 15px;
   border-radius: 15px;
+  -webkit-opacity: 0.8;
+  -moz-opacity: 0.8;
+  opacity: 0.8;
+  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(opacity=(80));
+  filter: alpha(opacity = (80));
 }
-.glize-arrow-area:hover .arrow {
+.glize-arrow-area:hover .glize-arrow {
   display: block;
 }
 .glize-arrow-left {

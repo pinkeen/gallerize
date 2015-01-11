@@ -158,6 +158,7 @@
             preloadAll: false,
             showInfo: true,
             showThumbs: true,
+            imgAsSource: false, // img src as big image and thumb
             thumbSlideDuration: 300
         }, settings);
 
@@ -180,7 +181,7 @@
             var img = $(this),
                 a = img.parent(),
                 attrs = {
-                    src: a.attr('href'),
+                    src: self.settings.imgAsSource ? img.attr('src') : a.attr('href'),
                     thumb: img.attr('src'),
                     title: a.attr('title'),
                     description: img.attr('alt')
